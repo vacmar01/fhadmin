@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "fhadmin"
+  site-url: "https://vacmar01.github.io/fhadmin"
+  description: "A lightweight, customizable admin panel for FastHTML applications with SQLite databases."
+  repo-branch: main
+  repo-url: "https://github.com/vacmar01/fhadmin"
