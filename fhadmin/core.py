@@ -195,7 +195,7 @@ def PageBtns(tbl, page, total_pages, q="", *, req=_mock_req):
 def SearchForm(tbl, q="", *, req=_mock_req):
     return Form(cls="flex gap-2 items-center")(
         Input_(name="q", value=q, placeholder="Search...", cls="input input-bordered input-sm w-64",
-               hx_get=url(req, f"/tables/{tbl}"), hx_trigger="input changed delay:300ms", hx_target="#table-content", hx_push_url="true"),
+               hx_get=url(req, f"/tables/{tbl}"), hx_trigger="input changed delay:300ms", hx_target="#table-content", hx_swap="innerHTML", hx_push_url="true"),
         A("Reset", href=url(req, f"/tables/{tbl}"), cls="btn btn-sm btn-ghost"))
 
 # %% ../nbs/00_core.ipynb 45
@@ -327,17 +327,23 @@ def get(req, sess, tbl: str, page: int = 1, q: str = ""):
     rows, total_pages = paginate(all_rows, page)
     
     header = Tr(*[Th(c) for c in cols], Th("Actions"))
-
-    left = Div(cls="lg:col-span-2")(
-        Div(cls="overflow-x-auto")(Table(cls="table table-zebra")(Thead(header), Tbody(*TableRows(rows, cols, tbl, req=req)))),
+    
+    table_content = Div(
+        Table(cls="table table-zebra")(Thead(header), Tbody(*TableRows(rows, cols, tbl, req=req))),
         Div(cls="flex gap-2 mt-4 justify-center")(*PageBtns(tbl, page, total_pages, q, req=req)))
+    
+    # If HTMX request, return just the table content
+    if req.headers.get("hx-request"):
+        return table_content
+
+    left = Div(cls="lg:col-span-2")(Div(cls="overflow-x-auto", id="table-content")(table_content))
 
     right = Div(cls="lg:col-span-1 flex flex-col gap-4")(
         Div(cls="card bg-base-200 p-4")(H3("Search", cls="font-bold mb-2"), SearchForm(tbl, q, req=req)),
         Div(cls="card bg-base-200 p-4")(SqlConsole(tbl, req=req)))
 
     return Layout(
-        Div(cls="flex items-center justify-between mb-4", id="table-content")(
+        Div(cls="flex items-center justify-between mb-4")(
             A(Heroicon("arrow-left", cls="size-4"), "Back", href=url(req, "/tables"), cls="btn btn-ghost btn-sm gap-1"), H1(tbl, cls="text-2xl font-bold inline"),
             NewRowBtn(tbl, req=req)),
         TableStats(db, tbl),
