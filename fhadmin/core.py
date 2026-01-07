@@ -3,9 +3,9 @@
 # %% auto 0
 __all__ = ['app', 'rt', 'AdminConfig', 'create_admin', 'tbl_name', 'mock_req', 'url', 'get_col_types', 'get_cols',
            'get_text_cols', 'is_dangerous_query', 'LabeledInput', 'HeaderBar', 'Layout', 'NewRowBtn', 'EditableCell',
-           'TableRows', 'NewRowModal', 'SqlConsole', 'DbStats', 'TableStats', 'LoginPage', 'TableCard', 'PageBtns',
-           'SearchForm', 'get', 'post', 'auth_check', 'DangerousQueryModal', 'put', 'delete', 'execute_and_render_sql',
-           'search_rows', 'paginate']
+           'EditCellInput', 'TableRows', 'NewRowModal', 'SqlConsole', 'DbStats', 'TableStats', 'LoginPage', 'TableCard',
+           'PageBtns', 'SearchForm', 'get', 'post', 'auth_check', 'DangerousQueryModal', 'put', 'delete',
+           'execute_and_render_sql', 'search_rows', 'paginate']
 
 # %% ../nbs/00_core.ipynb 5
 from fasthtml.common import *
@@ -106,6 +106,11 @@ def NewRowBtn(tbl, *, req=_mock_req): return Btn(Heroicon("plus"), "New Record",
 # %% ../nbs/00_core.ipynb 38
 def EditableCell(tbl, pk, col, val, *, req=_mock_req):
     return Td(str(val), hx_get=url(req, f"/tables/{tbl}/{pk}/edit/{col}"), hx_swap="outerHTML", cls="cursor-pointer hover:bg-base-200")
+
+# %% ../nbs/00_core.ipynb 39
+def EditCellInput(tbl, pk, col, val, *, req=_mock_req):
+    return Td(Input(value=val, name=col, cls="-bordered -sm w-full", autofocus=True,
+                     hx_put=url(req, f"/tables/{tbl}/{pk}/edit/{col}"), hx_target="closest td", hx_trigger="blur, keyup[key=='Enter']", hx_swap="outerHTML"))
 
 # %% ../nbs/00_core.ipynb 40
 def TableRows(rows, cols, tbl, *, req=_mock_req):
