@@ -76,6 +76,9 @@ def is_dangerous_query(query:str):
     return bool(re.search(r"drop table|delete|truncate|update|alter table", query.lower()))
 
 # %% ../nbs/00_core.ipynb 28
+mk_compfn("btn", "A", "LinkButton")
+
+# %% ../nbs/00_core.ipynb 30
 def LabeledInput(icon_name, **kwargs):
     return Label(
         Span(Heroicon(icon_name), cls="label"),
@@ -83,35 +86,35 @@ def LabeledInput(icon_name, **kwargs):
         cls="input w-full"
     )
 
-# %% ../nbs/00_core.ipynb 30
+# %% ../nbs/00_core.ipynb 32
 def HeaderBar(*,req=_mock_req, logged_in=False):
     logout_btn = Form(method="post", action=url(req, "/logout"))(
-        Btn(Heroicon("arrow-right-on-rectangle"), "Logout", cls="-ghost btn-sm gap-1")) if logged_in else None
+        Btn(Heroicon("arrow-right-on-rectangle"), "Logout", cls="-ghost -sm gap-1")) if logged_in else None
     return Div(cls="navbar bg-base-200 mb-6")(
-        Div(cls="flex-1")(A("fhadmin", href=url(req, "/tables"), cls="btn btn-ghost text-xl")),
+        Div(cls="flex-1")(LinkButton("fhadmin", href=url(req, "/tables"), cls="-ghost text-xl")),
         Div(cls="flex-none")(logout_btn))
 
-# %% ../nbs/00_core.ipynb 32
+# %% ../nbs/00_core.ipynb 34
 def Layout(*children, title="Admin", req=_mock_req, logged_in=False):
     return (Title(title), 
             HeaderBar(req=req, logged_in=logged_in),
             Main(cls="max-w-[1800px] mx-auto px-6 py-8")(*children))
 
-# %% ../nbs/00_core.ipynb 33
+# %% ../nbs/00_core.ipynb 35
 def NewRowBtn(tbl, *, req=_mock_req): return Btn(Heroicon("plus"), "New Record", cls="-primary -sm flex items-center gap-2", hx_get=url(req, f"/tables/{tbl}/new"), hx_target="body", hx_swap="beforeend")
 
-# %% ../nbs/00_core.ipynb 35
+# %% ../nbs/00_core.ipynb 37
 def EditableCell(tbl, pk, col, val, *, req=_mock_req):
     return Td(str(val), hx_get=url(req, f"/tables/{tbl}/{pk}/edit/{col}"), hx_swap="outerHTML", cls="cursor-pointer hover:bg-base-200")
 
-# %% ../nbs/00_core.ipynb 37
+# %% ../nbs/00_core.ipynb 39
 def TableRows(rows, cols, tbl, *, req=_mock_req):
     pk_col = cols[0]
     return [Tr(*[EditableCell(tbl, r[pk_col], c, r.get(c, ''), req=req) for c in cols],
                Td(Btn(Heroicon("trash"), cls="-ghost -xs", hx_delete=url(req, f"/tables/{tbl}/{r[pk_col]}"), hx_target="closest tr", hx_swap="outerHTML")))
             for r in rows]
 
-# %% ../nbs/00_core.ipynb 38
+# %% ../nbs/00_core.ipynb 40
 def NewRowModal(tbl, cols, *, req=_mock_req):
     inputs = [Div(cls="form-control")(Label(c, cls="label"), Input_(name=c, cls="input input-bordered w-full")) for c in cols[1:]]
     return Dialog(id="new-row-modal", cls="modal modal-open")(
@@ -122,7 +125,7 @@ def NewRowModal(tbl, cols, *, req=_mock_req):
                     Button("Cancel", cls="btn", type="button", onclick="document.getElementById('new-row-modal').remove()"),
                     Button("Create", cls="btn btn-primary", type="submit")))))
 
-# %% ../nbs/00_core.ipynb 39
+# %% ../nbs/00_core.ipynb 41
 def SqlConsole(tbl, *, req=_mock_req):
     return Div(
         H3("SQL Console", cls="font-bold mb-2"),
@@ -135,7 +138,7 @@ def SqlConsole(tbl, *, req=_mock_req):
         Div(id="sql-results", cls="mt-4")),
  
 
-# %% ../nbs/00_core.ipynb 40
+# %% ../nbs/00_core.ipynb 42
 def DbStats(cfg):
     path = Path(cfg.db_path)
     size_mb = path.stat().st_size / (1024 * 1024)
@@ -146,7 +149,7 @@ def DbStats(cfg):
         )
     )
 
-# %% ../nbs/00_core.ipynb 42
+# %% ../nbs/00_core.ipynb 44
 def TableStats(db, tbl):
     t = db.t[tbl]
     cols = get_cols(db, t)
@@ -163,7 +166,7 @@ def TableStats(db, tbl):
         )
     )
 
-# %% ../nbs/00_core.ipynb 44
+# %% ../nbs/00_core.ipynb 46
 def LoginPage(*, req=_mock_req):
     return Div(cls="min-h-screen flex items-center justify-center")(
         Card(cls="w-full max-w-sm shadow-xl")(
@@ -173,7 +176,7 @@ def LoginPage(*, req=_mock_req):
                     LabeledInput("lock-closed", type="password", name="password", placeholder="Password", required=True),
                     Btn("Login", cls="-primary w-full mt-4")))))
 
-# %% ../nbs/00_core.ipynb 46
+# %% ../nbs/00_core.ipynb 48
 def TableCard(name, row_count, col_count, *, req=_mock_req):
     return A(href=url(req, f"/tables/{name}"))(
         Card(cls="bg-base-200 hover:bg-base-300 transition-colors cursor-pointer")(
@@ -187,7 +190,7 @@ def TableCard(name, row_count, col_count, *, req=_mock_req):
         )
     )
 
-# %% ../nbs/00_core.ipynb 48
+# %% ../nbs/00_core.ipynb 50
 def PageBtns(tbl, page, total_pages, q="", *, req=_mock_req):
     if total_pages <= 7:
         pages = list(range(1, total_pages + 1))
@@ -198,16 +201,16 @@ def PageBtns(tbl, page, total_pages, q="", *, req=_mock_req):
         if page < total_pages - 3: pages.append(("...", 2))
         pages.extend([total_pages-1, total_pages])
         pages = list(dict.fromkeys(pages))  # remove duplicates, preserve order
-    return [Span("...", cls="px-2") if isinstance(p, tuple) else A(str(p), href=url(req, f"/tables/{tbl}?page={p}&q={q}"), cls=f"btn btn-sm {'btn-active' if p == page else ''}") for p in pages]
+    return [Span("...", cls="px-2") if isinstance(p, tuple) else LinkButton(str(p), href=url(req, f"/tables/{tbl}?page={p}&q={q}"), cls=f"-sm {'-active' if p == page else ''}") for p in pages]
 
-# %% ../nbs/00_core.ipynb 50
+# %% ../nbs/00_core.ipynb 52
 def SearchForm(tbl, q="", *, req=_mock_req):
     return Form(cls="flex gap-2 items-center")(
         Input(name="q", value=q, placeholder="Search...", cls="-bordered -sm w-64",
                hx_get=url(req, f"/tables/{tbl}"), hx_trigger="input changed delay:300ms", hx_target="#table-content", hx_swap="innerHTML", hx_push_url="true"),
-        A("Reset", href=url(req, f"/tables/{tbl}"), cls="btn btn-sm btn-ghost"))
+        LinkButton("Reset", href=url(req, f"/tables/{tbl}"), cls="-sm -ghost"))
 
-# %% ../nbs/00_core.ipynb 53
+# %% ../nbs/00_core.ipynb 55
 @rt("/login")
 def get(req): return Layout(LoginPage(req=req), title="Admin Login", req=req, logged_in=False)
 
@@ -217,17 +220,17 @@ def post(req, password: str, sess):
     sess['auth'] = True
     return Redirect(url(req, "/tables"))
 
-# %% ../nbs/00_core.ipynb 54
+# %% ../nbs/00_core.ipynb 56
 @rt("/logout")
 def post(req, sess):
     sess.pop('auth', None)
     return Redirect(url(req, "/login"))
 
-# %% ../nbs/00_core.ipynb 55
+# %% ../nbs/00_core.ipynb 57
 def auth_check(req, sess):
     if not sess.get('auth'): return Redirect(url(req, "/login"))
 
-# %% ../nbs/00_core.ipynb 56
+# %% ../nbs/00_core.ipynb 58
 def DangerousQueryModal(tbl, sql, *, req=_mock_req):
     return Modal(id="danger-modal", cls="-open")(
         ModalBox(
@@ -247,12 +250,12 @@ def DangerousQueryModal(tbl, sql, *, req=_mock_req):
         )
     )
 
-# %% ../nbs/00_core.ipynb 59
+# %% ../nbs/00_core.ipynb 61
 def _stats(t):
     table, _, stats = t
     return table, int(stats.split()[0])
 
-# %% ../nbs/00_core.ipynb 61
+# %% ../nbs/00_core.ipynb 63
 @rt("/tables")
 def get(req, sess):
     if redir := auth_check(req, sess): return redir
@@ -269,7 +272,7 @@ def get(req, sess):
         title="Tables", req=req, logged_in=True
     )
 
-# %% ../nbs/00_core.ipynb 63
+# %% ../nbs/00_core.ipynb 65
 @rt("/tables/{tbl}/{pk}/edit/{col}")
 def get(req, sess, tbl: str, pk: str, col: str):
     if redir := auth_check(req, sess): return redir
@@ -277,14 +280,14 @@ def get(req, sess, tbl: str, pk: str, col: str):
     row = db.t[tbl][pk]
     return EditCellInput(tbl, pk, col, row.get(col, ''), req=req)
 
-# %% ../nbs/00_core.ipynb 64
+# %% ../nbs/00_core.ipynb 66
 @rt("/tables/{tbl}/new")
 def get(req, sess, tbl: str):
     if redir := auth_check(req, sess): return redir
     db = app.state.cfg.db
     return NewRowModal(tbl, get_cols(db, db.t[tbl]), req=req)
 
-# %% ../nbs/00_core.ipynb 65
+# %% ../nbs/00_core.ipynb 67
 @rt("/tables/{tbl}/new")
 async def post(req, sess, tbl: str):
     if redir := auth_check(req, sess): return redir
@@ -305,7 +308,7 @@ async def put(req, sess, tbl: str, pk: str, col: str):
     db.execute(f"UPDATE {tbl} SET {col} = ? WHERE {pk_col} = ?", [val, pk])
     return EditableCell(tbl, pk, col, val, req=req)
 
-# %% ../nbs/00_core.ipynb 67
+# %% ../nbs/00_core.ipynb 69
 @rt("/tables/{tbl}/{pk}")
 def delete(req, sess, tbl: str, pk: str):
     if not sess.get('auth'): return Redirect(url(req, "/login"))
@@ -314,7 +317,7 @@ def delete(req, sess, tbl: str, pk: str):
     t.delete(pk)
     return ""
 
-# %% ../nbs/00_core.ipynb 69
+# %% ../nbs/00_core.ipynb 71
 def execute_and_render_sql(db, sql):
     try:
         cursor = db.execute(sql)
@@ -330,7 +333,7 @@ def execute_and_render_sql(db, sql):
     except Exception as e: 
         return Div(f"Error: {e}", cls="text-error")
 
-# %% ../nbs/00_core.ipynb 70
+# %% ../nbs/00_core.ipynb 72
 @rt("/tables/{tbl}/sql")
 def post(req, sess, tbl: str, sql: str):
     if redir := auth_check(req, sess): return redir
@@ -349,20 +352,20 @@ def post(req, sess, tbl: str, sql: str):
     db = app.state.cfg.db
     return execute_and_render_sql(db, sql)
 
-# %% ../nbs/00_core.ipynb 71
+# %% ../nbs/00_core.ipynb 73
 def search_rows(db, tbl, cols, text_cols, q):
     if not (q and text_cols): return db.t[tbl]()
     where = " OR ".join([f"{c} LIKE ?" for c in text_cols])
     rows = db.execute(f"SELECT * FROM {tbl} WHERE {where}", [f"%{q}%" for _ in text_cols]).fetchall()
     return [dict(zip(cols, r)) for r in rows]
 
-# %% ../nbs/00_core.ipynb 72
+# %% ../nbs/00_core.ipynb 74
 def paginate(rows, page, per_page=25):
     total = len(rows)
     total_pages = max(1, (total + per_page - 1) // per_page)
     return rows[(page-1)*per_page : page*per_page], total_pages
 
-# %% ../nbs/00_core.ipynb 73
+# %% ../nbs/00_core.ipynb 75
 @rt("/tables/{tbl}")
 def get(req, sess, tbl: str, page: int = 1, q: str = ""):
     if redir := auth_check(req, sess): return redir
@@ -390,7 +393,7 @@ def get(req, sess, tbl: str, page: int = 1, q: str = ""):
 
     return Layout(
         Div(cls="flex items-center justify-between mb-4")(
-            A(Heroicon("arrow-left", cls="size-4"), "Back", href=url(req, "/tables"), cls="btn btn-ghost btn-sm gap-1"), H1(tbl, cls="text-2xl font-bold inline"),
+            LinkButton(Heroicon("arrow-left", cls="size-4"), "Back", href=url(req, "/tables"), cls="-ghost -sm gap-1"), H1(tbl, cls="text-2xl font-bold inline"),
             NewRowBtn(tbl, req=req)),
         TableStats(db, tbl),
         Div(cls="grid grid-cols-1 lg:grid-cols-3 gap-6")(left, right),
