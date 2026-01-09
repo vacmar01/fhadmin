@@ -267,15 +267,13 @@ def _stats(t):
     table, _, stats = t
     return table, int(stats.split()[0])
 
-# %% ../nbs/00_core.ipynb 65
+# %% ../nbs/00_core.ipynb 64
 @rt("/tables")
 def get(req, sess):
     if redir := auth_check(req, sess): return redir
     db = app.state.cfg.db
-    try:
-        row_counts = dict(L(db.execute("SELECT * FROM sqlite_stat1").fetchall()).map(_stats))
-    except:
-        row_counts = {tbl_name(t): db.execute(f'SELECT COUNT(*) FROM "{tbl_name(t)}"').fetchone()[0] for t in db.t}
+
+    row_counts = {tbl_name(t): db.execute(f'SELECT COUNT(*) FROM "{tbl_name(t)}"').fetchone()[0] for t in db.t}
     cards = [TableCard(tbl_name(t), row_counts.get(tbl_name(t), 0), len(get_cols(db, t)), req=req) for t in db.t]
     return Layout(
         DbStats(app.state.cfg),
@@ -284,7 +282,7 @@ def get(req, sess):
         title="Tables", req=req, logged_in=True
     )
 
-# %% ../nbs/00_core.ipynb 67
+# %% ../nbs/00_core.ipynb 66
 @rt("/tables/{tbl}/{pk}/edit/{col}")
 def get(req, sess, tbl: str, pk: str, col: str):
     if redir := auth_check(req, sess): return redir
@@ -292,14 +290,14 @@ def get(req, sess, tbl: str, pk: str, col: str):
     row = db.t[tbl][pk]
     return EditCellInput(tbl, pk, col, row.get(col, ''), req=req)
 
-# %% ../nbs/00_core.ipynb 68
+# %% ../nbs/00_core.ipynb 67
 @rt("/tables/{tbl}/new")
 def get(req, sess, tbl: str):
     if redir := auth_check(req, sess): return redir
     db = app.state.cfg.db
     return NewRowModal(tbl, get_cols(db, db.t[tbl]), req=req)
 
-# %% ../nbs/00_core.ipynb 69
+# %% ../nbs/00_core.ipynb 68
 @rt("/tables/{tbl}/new")
 async def post(req, sess, tbl: str):
     if redir := auth_check(req, sess): return redir
@@ -320,7 +318,7 @@ async def put(req, sess, tbl: str, pk: str, col: str):
     db.execute(f"UPDATE {tbl} SET {col} = ? WHERE {pk_col} = ?", [val, pk])
     return EditableCell(tbl, pk, col, val, req=req)
 
-# %% ../nbs/00_core.ipynb 71
+# %% ../nbs/00_core.ipynb 70
 @rt("/tables/{tbl}/{pk}")
 def delete(req, sess, tbl: str, pk: str):
     if not sess.get('auth'): return Redirect(url(req, "/login"))
@@ -329,7 +327,7 @@ def delete(req, sess, tbl: str, pk: str):
     t.delete(pk)
     return ""
 
-# %% ../nbs/00_core.ipynb 73
+# %% ../nbs/00_core.ipynb 72
 def execute_and_render_sql(db, sql):
     try:
         cursor = db.execute(sql)
@@ -345,7 +343,7 @@ def execute_and_render_sql(db, sql):
     except Exception as e: 
         return Div(f"Error: {e}", cls="text-error")
 
-# %% ../nbs/00_core.ipynb 74
+# %% ../nbs/00_core.ipynb 73
 @rt("/tables/{tbl}/sql")
 def post(req, sess, tbl: str, sql: str):
     if redir := auth_check(req, sess): return redir
@@ -364,20 +362,20 @@ def post(req, sess, tbl: str, sql: str):
     db = app.state.cfg.db
     return execute_and_render_sql(db, sql)
 
-# %% ../nbs/00_core.ipynb 75
+# %% ../nbs/00_core.ipynb 74
 def search_rows(db, tbl, cols, text_cols, q):
     if not (q and text_cols): return db.t[tbl]()
     where = " OR ".join([f"{c} LIKE ?" for c in text_cols])
     rows = db.execute(f"SELECT * FROM {tbl} WHERE {where}", [f"%{q}%" for _ in text_cols]).fetchall()
     return [dict(zip(cols, r)) for r in rows]
 
-# %% ../nbs/00_core.ipynb 76
+# %% ../nbs/00_core.ipynb 75
 def paginate(rows, page, per_page=25):
     total = len(rows)
     total_pages = max(1, (total + per_page - 1) // per_page)
     return rows[(page-1)*per_page : page*per_page], total_pages
 
-# %% ../nbs/00_core.ipynb 77
+# %% ../nbs/00_core.ipynb 76
 @rt("/tables/{tbl}")
 def get(req, sess, tbl: str, page: int = 1, q: str = ""):
     if redir := auth_check(req, sess): return redir
