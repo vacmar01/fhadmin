@@ -15,6 +15,7 @@ SQLite databases.
 - ➕ Create new records via modal
 - 🗑️ Delete records
 - 💻 SQL console for custom queries
+- ⚠️ Dangerous SQL query detection with confirmation prompts
 - 📄 Pagination with smart page buttons
 - 🎨 Beautiful UI with DaisyUI/Tailwind
 
@@ -74,7 +75,8 @@ it:
 | `/tables/{tbl}/new` | GET/POST | Create new record |
 | `/tables/{tbl}/{pk}` | DELETE | Delete record |
 | `/tables/{tbl}/{pk}/edit/{col}` | GET/PUT | Inline cell editing |
-| `/tables/{tbl}/sql` | POST | Execute custom SQL |
+| `/tables/{tbl}/sql` | POST | Execute SQL query |
+| `/tables/{tbl}/sql/confirm` | POST | Confirm dangerous SQL queries |
 
 ## Requirements
 
