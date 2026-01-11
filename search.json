@@ -1,0 +1,202 @@
+[
+  {
+    "objectID": "core.html",
+    "href": "core.html",
+    "title": "fhadmin",
+    "section": "",
+    "text": "The idea is to build an admin panel for apps using FastHTML and SQLite. I wanna use fastlite to talk to the database and fhdaisy to style the app. The idea is to have this a standalone app that I can mount into another app.\nPlease use your tools to change the messages directly when I prompt you to change something.",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "core.html#the-idea",
+    "href": "core.html#the-idea",
+    "title": "fhadmin",
+    "section": "",
+    "text": "The idea is to build an admin panel for apps using FastHTML and SQLite. I wanna use fastlite to talk to the database and fhdaisy to style the app. The idea is to have this a standalone app that I can mount into another app.\nPlease use your tools to change the messages directly when I prompt you to change something.",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "core.html#setup",
+    "href": "core.html#setup",
+    "title": "fhadmin",
+    "section": "Setup",
+    "text": "Setup\n\nfrom fastcore.net import urlsave\n\n\np = mk_previewer(app)",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "core.html#database",
+    "href": "core.html#database",
+    "title": "fhadmin",
+    "section": "Database",
+    "text": "Database\nFor development we’ll use the chinook sqlite database. This cell downloads it in the right place if you don’t have it already downloaded.\n\nurl = 'https://github.com/lerocha/chinook-database/raw/master/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite'\npath = Path('../data/chinook.sqlite')\nif not path.exists(): urlsave(url, path)\n\n\ndb = database(\"../data/chinook.sqlite\")",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "core.html#configuration",
+    "href": "core.html#configuration",
+    "title": "fhadmin",
+    "section": "Configuration",
+    "text": "Configuration\n\nsource\n\nAdminConfig\n\ndef AdminConfig(\n    db_path:str \\| pathlib.Path, password:str='admin123'\n)-&gt;None:\n\n\ncfg = AdminConfig(db_path=\"../data/chinook.sqlite\", password=\"admin123\")\n\n\nsource\n\n\ncreate_admin\n\ndef create_admin(\n    config\n):\n\n\napp = create_admin(cfg)",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "core.html#utility-functions",
+    "href": "core.html#utility-functions",
+    "title": "fhadmin",
+    "section": "Utility Functions",
+    "text": "Utility Functions\n\nsource\n\ntbl_name\n\ndef tbl_name(\n    t\n):\n\n\nassert tbl_name('\"Artist\"') == 'Artist'\n\n\nsource\n\n\nurl\n\ndef url(\n    req, path\n):\n\n\nsource\n\n\nmock_req\n\ndef mock_req(\n    root_path:str=''\n):\n\n\nsource\n\n\nget_col_types\n\ndef get_col_types(\n    db, t\n):\n\n\nassert get_col_types(app.state.cfg.db, 'Artist') == {'ArtistId': 'INTEGER', 'Name': 'NVARCHAR(120)'}\n\n\nsource\n\n\nget_cols\n\ndef get_cols(\n    db, t\n):\n\n\nassert get_cols(app.state.cfg.db, 'Artist') == ['ArtistId', 'Name']\n\n\nsource\n\n\nget_text_cols\n\ndef get_text_cols(\n    db, t\n):\n\n\nassert get_text_cols(app.state.cfg.db, 'Artist') == ['Name']\n\n\nsource\n\n\nget_pk_col\n\ndef get_pk_col(\n    db, t\n):\n\n\nassert get_pk_col(app.state.cfg.db, 'Artist') == 'ArtistId'\n\n\nsource\n\n\nget_table_info\n\ndef get_table_info(\n    db, t\n):\n\n\nassert get_table_info(app.state.cfg.db, 'Artist') == (['ArtistId', 'Name'], 'ArtistId')\n\n\n# Test SQL queries\ndangerous_queries = [\n    \"DROP TABLE Album\",\n    \"DELETE FROM Track WHERE TrackId &gt; 100\",\n    \"DELETE FROM Artist\",  # no WHERE clause\n    \"UPDATE Track SET Name = 'test'\",  # no WHERE clause\n    \"TRUNCATE TABLE Playlist\",\n    \"ALTER TABLE Album ADD COLUMN test TEXT\",\n]\n\nsafe_queries = [\n    \"SELECT * FROM Album LIMIT 10\",\n    \"SELECT COUNT(*) FROM Track\",\n    \"SELECT * FROM Artist WHERE ArtistId = 1\",\n    \"SELECT Name, Composer FROM Track WHERE AlbumId = 5\",\n]\n\n\nsource\n\n\nis_dangerous_query\n\ndef is_dangerous_query(\n    query:str\n):\n\n\nassert not is_dangerous_query(safe_queries[0])\nassert is_dangerous_query(dangerous_queries[1])",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "core.html#ui-components",
+    "href": "core.html#ui-components",
+    "title": "fhadmin",
+    "section": "UI Components",
+    "text": "UI Components\n\nprint(LinkButton()), print(LinkButton(cls=\"-primary\"))\n\n\nsource\n\nLabeledInput\n\ndef LabeledInput(\n    icon_name, kwargs:VAR_KEYWORD\n):\n\n\np(LabeledInput(\"lock-closed\", placeholder=\"Password\"))\n\n\nsource\n\n\nHeaderBar\n\ndef HeaderBar(\n    req:Request=&lt;starlette.requests.Request object at 0x7f6d9becbc20&gt;, logged_in:bool=False\n):\n\n\np(HeaderBar(logged_in=True))\n\n\nsource\n\n\nLayout\n\ndef Layout(\n    children:VAR_POSITIONAL, title:str='Admin', req:Request=&lt;starlette.requests.Request object at 0x7f6d9becbc20&gt;,\n    logged_in:bool=False\n):\n\n\nsource\n\n\nNewRowBtn\n\ndef NewRowBtn(\n    tbl, req:Request=&lt;starlette.requests.Request object at 0x7f6d9becbc20&gt;\n):\n\n\np(NewRowBtn(\"Artist\"))\n\n\nsource\n\n\nEditableCell\n\ndef EditableCell(\n    tbl, pk, col, val, req:Request=&lt;starlette.requests.Request object at 0x7f6d9becbc20&gt;\n):\n\n\nsource\n\n\nEditCellInput\n\ndef EditCellInput(\n    tbl, pk, col, val, req:Request=&lt;starlette.requests.Request object at 0x7f6d9becbc20&gt;\n):\n\n\nsource\n\n\nTableRows\n\ndef TableRows(\n    db, rows, cols, tbl, req:Request=&lt;starlette.requests.Request object at 0x7f6d9becbc20&gt;\n):\n\n\nsource\n\n\nNewRowModal\n\ndef NewRowModal(\n    tbl, cols, req:Request=&lt;starlette.requests.Request object at 0x7f6d9becbc20&gt;\n):\n\n\nsource\n\n\nSqlConsole\n\ndef SqlConsole(\n    tbl, req:Request=&lt;starlette.requests.Request object at 0x7f6d9becbc20&gt;\n):\n\n\nsource\n\n\nDbStats\n\ndef DbStats(\n    cfg\n):\n\n\np(DbStats(cfg))\n\n\nsource\n\n\nTableStats\n\ndef TableStats(\n    db, tbl\n):\n\n\np(TableStats(cfg.db, \"Artist\"))\n\n\nsource\n\n\nLoginPage\n\ndef LoginPage(\n    req:Request=&lt;starlette.requests.Request object at 0x7f6d9becbc20&gt;\n):\n\n\np(LoginPage())\n\n\nsource\n\n\nTableCard\n\ndef TableCard(\n    name, row_count, col_count, req:Request=&lt;starlette.requests.Request object at 0x7f6d9becbc20&gt;\n):\n\n\np(TableCard(\"Foobar\", 123,123))\n\n\nsource\n\n\nPageBtns\n\ndef PageBtns(\n    tbl, page, total_pages, q:str='', req:Request=&lt;starlette.requests.Request object at 0x7f6d9becbc20&gt;\n):\n\n\np(Div(*PageBtns(\"Artist\", 5, 25), cls=\"flex gap-2\"))\n\n\nsource\n\n\nSearchForm\n\ndef SearchForm(\n    tbl, q:str='', req:Request=&lt;starlette.requests.Request object at 0x7f6d9becbc20&gt;\n):\n\n\np(SearchForm(\"Artist\"))",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "core.html#authentication",
+    "href": "core.html#authentication",
+    "title": "fhadmin",
+    "section": "Authentication",
+    "text": "Authentication\n\nsource\n\npost\n\ndef post(\n    req, password:str, sess\n):\n\n\nsource\n\n\nget\n\ndef get(\n    req\n):\n\n\nsource\n\n\npost\n\ndef post(\n    req, sess\n):\n\n\nsource\n\n\nauth_check\n\ndef auth_check(\n    req, sess\n):\n\n\nsource\n\n\nDangerousQueryModal\n\ndef DangerousQueryModal(\n    tbl, sql, req:Request=&lt;starlette.requests.Request object at 0x7f6d9becbc20&gt;\n):\n\n\np(DangerousQueryModal(\"Artist\", \"DROP TABLE Artist;\"))",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "core.html#tables-overview",
+    "href": "core.html#tables-overview",
+    "title": "fhadmin",
+    "section": "Tables Overview",
+    "text": "Tables Overview\n\nsource\n\nget\n\ndef get(\n    req, sess\n):",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "core.html#table-detail-view",
+    "href": "core.html#table-detail-view",
+    "title": "fhadmin",
+    "section": "Table Detail View",
+    "text": "Table Detail View\n\nsource\n\nget\n\ndef get(\n    req, sess, tbl:str, pk:str, col:str\n):\n\n\nsource\n\n\nget\n\ndef get(\n    req, sess, tbl:str\n):\n\n\nsource\n\n\nput\n\ndef put(\n    req, sess, tbl:str, pk:str, col:str\n):\n\n\nsource\n\n\npost\n\ndef post(\n    req, sess, tbl:str\n):\n\ndelete row route\n\nsource\n\n\ndelete\n\ndef delete(\n    req, sess, tbl:str, pk:str\n):\n\nThat’s the route to make a sql query to the db.\n\nsource\n\n\nexecute_and_render_sql\n\ndef execute_and_render_sql(\n    db, sql\n):\n\n\nsource\n\n\npost\n\ndef post(\n    req, sess, tbl:str, sql:str\n):\n\n\nsource\n\n\npost\n\ndef post(\n    req, sess, tbl:str, sql:str\n):\n\n\nsource\n\n\nsearch_rows\n\ndef search_rows(\n    db, tbl, cols, text_cols, q\n):\n\n\nsource\n\n\npaginate\n\ndef paginate(\n    rows, page, per_page:int=25\n):\n\n\nsource\n\n\nget\n\ndef get(\n    req, sess, tbl:str, page:int=1, q:str=''\n):",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "core.html#server",
+    "href": "core.html#server",
+    "title": "fhadmin",
+    "section": "Server",
+    "text": "Server\n\nif 'srv' in globals():\n    srv.stop()\n\n\nsrv = JupyUvi(app)\n\n\nTest mounting\n\nparent = FastHTML()\n\n@parent.get(\"/foobar\")\ndef home(): return H1(\"Parent App\"), A(\"Go to Admin\", href=\"/admin/tables\")\n\nparent.mount(\"/admin\", app)\n\n\nif \"srv\" in globals(): srv.stop()\nsrv = JupyUvi(parent)\n\n\napp.routes\n\n\nparent.routes",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "fhadmin",
+    "section": "",
+    "text": "A lightweight, customizable admin panel for FastHTML applications with SQLite databases.",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "index.html#features",
+    "href": "index.html#features",
+    "title": "fhadmin",
+    "section": "Features",
+    "text": "Features\n\n🔐 Simple password authentication\n📊 Table browser with card-based overview\n🔍 Full-text search across text columns\n✏️ Inline cell editing\n➕ Create new records via modal\n🗑️ Delete records\n💻 SQL console for custom queries\n⚠️ Dangerous SQL query detection with confirmation prompts\n📄 Pagination with smart page buttons\n🎨 Beautiful UI with DaisyUI/Tailwind",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "fhadmin",
+    "section": "Installation",
+    "text": "Installation\npip install fhadmin",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "index.html#quick-start",
+    "href": "index.html#quick-start",
+    "title": "fhadmin",
+    "section": "Quick Start",
+    "text": "Quick Start\nfrom fasthtml.common import *\nfrom fhadmin.core import AdminConfig, create_admin\nfrom fastlite import database\n\n# Create your main app\napp = FastHTML()\n\n# Configure and mount the admin panel\ncfg = AdminConfig(db_path=\"data/mydata.sqlite\", password=\"secret\")\nadmin_app = create_admin(cfg)\napp.mount(\"/admin\", admin_app)\nVisit /admin/login to access the admin panel.",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "index.html#configuration",
+    "href": "index.html#configuration",
+    "title": "fhadmin",
+    "section": "Configuration",
+    "text": "Configuration\nThe AdminConfig dataclass accepts:\n\n\n\n\n\n\n\n\n\nParameter\nType\nDefault\nDescription\n\n\n\n\ndb_path\nstr \\| Path\nrequired\nPath to SQLite database file\n\n\npassword\nstr\n\"admin123\"\nAdmin login password",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "index.html#how-it-works",
+    "href": "index.html#how-it-works",
+    "title": "fhadmin",
+    "section": "How It Works",
+    "text": "How It Works\nfhadmin uses a configuration-based architecture that stores settings in app.state.cfg. Routes read the configuration at request time, making it:\n\nNotebook-friendly — Rerun any route cell without side effects\nEasy to debug — Routes are plain functions, no closures\nFlexible — Change database or password at runtime if needed",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "index.html#routes",
+    "href": "index.html#routes",
+    "title": "fhadmin",
+    "section": "Routes",
+    "text": "Routes\n\n\n\nRoute\nMethod\nDescription\n\n\n\n\n/login\nGET/POST\nAuthentication\n\n\n/logout\nPOST\nEnd session\n\n\n/tables\nGET\nTable overview cards\n\n\n/tables/{tbl}\nGET\nBrowse table with search & pagination\n\n\n/tables/{tbl}/new\nGET/POST\nCreate new record\n\n\n/tables/{tbl}/{pk}\nDELETE\nDelete record\n\n\n/tables/{tbl}/{pk}/edit/{col}\nGET/PUT\nInline cell editing\n\n\n/tables/{tbl}/sql\nPOST\nExecute SQL query\n\n\n/tables/{tbl}/sql/confirm\nPOST\nConfirm dangerous SQL queries",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "index.html#requirements",
+    "href": "index.html#requirements",
+    "title": "fhadmin",
+    "section": "Requirements",
+    "text": "Requirements\n\nPython 3.10+\nfasthtml\nfastlite\nfhdaisy\nfh-heroicons",
+    "crumbs": [
+      "fhadmin"
+    ]
+  },
+  {
+    "objectID": "index.html#license",
+    "href": "index.html#license",
+    "title": "fhadmin",
+    "section": "License",
+    "text": "License\nMIT",
+    "crumbs": [
+      "fhadmin"
+    ]
+  }
+]
