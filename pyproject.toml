@@ -1,3 +1,31 @@
 [build-system]
-requires = ["setuptools>=64.0"]
+requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "fhadmin"
+dynamic = ["version"]
+description = "A lightweight, customizable admin panel for FastHTML applications with SQLite databases."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Apache-2.0"}
+authors = [{name = "Marius Vach", email = "mariusvach@gmail.com"}]
+keywords = ['nbdev', 'jupyter', 'notebook', 'python']
+classifiers = ["Natural Language :: English", "Intended Audience :: Developers", "Development Status :: 3 - Alpha", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3 :: Only"]
+dependencies = ['python-fasthtml', 'fhdaisy', 'fh-heroicons']
+
+[project.urls]
+Repository = "https://github.com/vacmar01/fhadmin"
+Documentation = "https://vacmar01.github.io/fhadmin"
+
+[project.entry-points.nbdev]
+fhadmin = "fhadmin._modidx:d"
+
+[tool.setuptools.dynamic]
+version = {attr = "fhadmin.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["fhadmin"]
+
+[tool.nbdev]
+allowed_cell_metadata_keys = ['solveit_ai']

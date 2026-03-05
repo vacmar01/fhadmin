@@ -157,3 +157,7 @@ checklink/cookies.txt
 .sesskey
 *.sqlite-wal
 *.sqlite-shm
+
+# Solveit dialogs (environment-specific)
+CRAFT.ipynb
+controller.ipynb
