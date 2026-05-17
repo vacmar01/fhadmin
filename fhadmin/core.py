@@ -14,6 +14,8 @@ from fhdaisy import *
 
 from fastcore.utils import *
 
+from fastlite import database
+
 from fh_heroicons import Heroicon 
 
 from fasthtml.common import Input as Input_
